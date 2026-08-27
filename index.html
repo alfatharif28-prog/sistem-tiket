@@ -330,7 +330,106 @@
   </div>
 
   <script>
+// ==========================================
+// UPLOAD BUKTI PEMBAYARAN
+// ==========================================
 
+const buktiBayarInput = document.getElementById("buktiBayar");
+const uploadBayarBtn = document.getElementById("uploadBayarBtn");
+const uploadStatus = document.getElementById("uploadStatus");
+
+uploadBayarBtn.addEventListener("click", async function () {
+
+  const file = buktiBayarInput.files[0];
+
+  if (!file) {
+    uploadStatus.textContent = "❌ Silakan pilih bukti pembayaran terlebih dahulu.";
+    return;
+  }
+
+  // Maksimal 5 MB
+  if (file.size > 5 * 1024 * 1024) {
+    uploadStatus.textContent = "❌ Ukuran file maksimal 5 MB.";
+    return;
+  }
+
+  // Hanya gambar
+  if (!file.type.startsWith("image/")) {
+    uploadStatus.textContent = "❌ File harus berupa gambar.";
+    return;
+  }
+
+  uploadBayarBtn.disabled = true;
+  uploadBayarBtn.textContent = "Mengupload...";
+
+  uploadStatus.textContent = "⏳ Sedang mengupload bukti pembayaran...";
+
+  try {
+
+    // Ambil ticket code yang sudah dibuat
+    const ticketCode =
+      document.getElementById("ticketCode").textContent.trim();
+
+    if (!ticketCode) {
+      throw new Error("Ticket code belum tersedia.");
+    }
+
+    // Ambil ekstensi file
+    const extension =
+      file.name.split(".").pop().toLowerCase();
+
+    // Nama file unik
+    const fileName =
+      ticketCode + "-" + Date.now() + "." + extension;
+
+    const filePath =
+      "tickets/" + fileName;
+
+    // Upload ke Supabase Storage
+    const { data, error } = await supabaseClient
+      .storage
+      .from("bukti-pembayaran")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    // Simpan path file ke database
+    const { error: updateError } = await supabaseClient
+      .from("tickets")
+      .update({
+        bukti_bayar: data.path
+      })
+      .eq("ticket_code", ticketCode);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    uploadStatus.textContent =
+      "✅ Bukti pembayaran berhasil diupload.";
+
+    uploadBayarBtn.textContent =
+      "Bukti Berhasil Diupload";
+
+  } catch (error) {
+
+    console.error(error);
+
+    uploadStatus.textContent =
+      "❌ Upload gagal: " + error.message;
+
+    uploadBayarBtn.disabled = false;
+    uploadBayarBtn.textContent =
+      "Upload Bukti Bayar";
+  }
+
+});
     /*
       ============================================
       SUPABASE CONFIGURATION
