@@ -3,61 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiket Online</title>
+
+    <title>UyeeFest - Tiket Online</title>
 
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f2f2f2;
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px;
         }
 
         .container {
             max-width: 600px;
-            margin: 50px auto;
+            margin: 40px auto;
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 15px;
-            text-align: center;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
         h1 {
-            font-size: 32px;
+            text-align: center;
         }
 
-        p {
-            color: #555;
+        .subtitle {
+            text-align: center;
+            color: #666;
         }
 
-        .button {
-            display: inline-block;
+        label {
+            display: block;
             margin-top: 20px;
-            padding: 15px 30px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
             background: black;
             color: white;
-            text-decoration: none;
+            border: none;
             border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>🎫 Tiket Online</h1>
+    <h1>🎫 UyeeFest</h1>
 
-        <p>Selamat datang di website pembelian tiket.</p>
+    <p class="subtitle">
+        Pembelian Tiket Online
+    </p>
 
-        <p>Silakan klik tombol di bawah untuk membeli tiket.</p>
-
-        <a href="#" class="button">
-            Beli Tiket
-        </a>
-
+    <div class="info">
+        <strong>Harga Tiket</strong>
+        <br>
+        Rp100.000 / orang
     </div>
+
+    <form>
+
+        <label for="nama">
+            Nama Lengkap
+        </label>
+
+        <input
+            type="text"
+            id="nama"
+            placeholder="Masukkan nama lengkap"
+            required
+        >
+
+        <label for="email">
+            Email
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="contoh@email.com"
+            required
+        >
+
+        <label for="telepon">
+            Nomor WhatsApp
+        </label>
+
+        <input
+            type="tel"
+            id="telepon"
+            placeholder="08xxxxxxxxxx"
+            required
+        >
+
+        <label for="jumlah">
+            Jumlah Tiket
+        </label>
+
+        <select id="jumlah" required>
+            <option value="">-- Pilih jumlah tiket --</option>
+            <option value="1">1 Tiket</option>
+            <option value="2">2 Tiket</option>
+            <option value="3">3 Tiket</option>
+            <option value="4">4 Tiket</option>
+            <option value="5">5 Tiket</option>
+        </select>
+
+        <button type="submit">
+            Lanjut ke Pembayaran
+        </button>
+
+    </form>
+
+</div>
 
 </body>
 </html>
