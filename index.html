@@ -90,7 +90,7 @@
         Rp50.000 / orang
     </div>
 
-    <form id="ticketForm">
+    <form onsubmit="prosesPembayaran(event)">
 
         <label for="nama">
             Nama Lengkap
@@ -146,27 +146,51 @@
 
 </div>
 <script>
-document.getElementById("ticketForm").addEventListener("submit", function(event) {
+function prosesPembayaran(event) {
     event.preventDefault();
 
     const nama = document.getElementById("nama").value;
     const email = document.getElementById("email").value;
     const telepon = document.getElementById("telepon").value;
-    const jumlah = document.getElementById("jumlah").value;
+    const jumlah = Number(document.getElementById("jumlah").value);
 
     const harga = 50000;
-    const total = Number(jumlah) * harga;
+    const total = jumlah * harga;
 
-    alert(
-        "DATA BERHASIL DIPROSES!\n\n" +
-        "Nama: " + nama +
-        "\nEmail: " + email +
-        "\nWhatsApp: " + telepon +
-        "\nJumlah tiket: " + jumlah +
-        "\nTotal pembayaran: Rp" + total.toLocaleString("id-ID")
-    );
-});
+    document.querySelector(".container").innerHTML = `
+        <h1>🎟️ Pembayaran UyeeFest</h1>
+
+        <p class="subtitle">
+            Silakan lakukan pembayaran melalui transfer bank
+        </p>
+
+        <div class="info">
+            <strong>Detail Pembelian</strong><br><br>
+
+            Nama: ${nama}<br>
+            Email: ${email}<br>
+            WhatsApp: ${telepon}<br>
+            Jumlah Tiket: ${jumlah}<br><br>
+
+            <strong>Total Pembayaran:</strong><br>
+            <span style="font-size:24px;">
+                Rp${total.toLocaleString("id-ID")}
+            </span>
+        </div>
+
+        <div class="info">
+            <strong>Transfer Bank</strong><br><br>
+
+            Bank BCA<br>
+            No. Rekening: <strong>1160544887</strong><br>
+            Atas Nama: <strong>Muhammad Fadhil Pratama</strong>
+        </div>
+
+        <button onclick="location.reload()">
+            Kembali
+        </button>
+    `;
+}
 </script>
-
 </body>
 </html>
