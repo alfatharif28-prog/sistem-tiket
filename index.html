@@ -1,11 +1,441 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    ...
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Uyee Fest - Tiket Online</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      color: #222;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #333;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .success {
+      background: #dff6e4;
+      color: #146c2e;
+    }
+
+    .error {
+      background: #ffe0e0;
+      color: #a00000;
+    }
+
+    #ticket {
+      display: none;
+      margin-top: 30px;
+      padding: 25px;
+      border: 2px dashed #111;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    #qrcode {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .ticket-code {
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .info {
+      text-align: left;
+      line-height: 1.8;
+      margin-top: 20px;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 20px;
+    }
+
+    .print-btn {
+      background: #555;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .container > h1,
+      .container > .subtitle,
+      form,
+      .message,
+      .print-btn {
+        display: none !important;
+      }
+
+      .container {
+        box-shadow: none;
+        margin: 0;
+      }
+
+      #ticket {
+        display: block !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    ...
-</body>
 
+  <div class="container">
+
+    <h1>UYEE FEST</h1>
+    <div class="subtitle">Pendaftaran Tiket Online</div>
+
+    <form id="ticketForm">
+
+      <label for="nama">Nama Lengkap Sesuai KTP</label>
+      <input
+        type="text"
+        id="nama"
+        placeholder="Masukkan nama lengkap"
+        required
+      >
+
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="contoh@email.com"
+        required
+      >
+
+      <label for="whatsapp">WhatsApp</label>
+      <input
+        type="tel"
+        id="whatsapp"
+        placeholder="08xxxxxxxxxx"
+        required
+      >
+
+      <label for="jumlah">Jumlah Tiket</label>
+      <select id="jumlah" required>
+        <option value="">Pilih jumlah tiket</option>
+        <option value="1">1 Tiket</option>
+        <option value="2">2 Tiket</option>
+        <option value="3">3 Tiket</option>
+        <option value="4">4 Tiket</option>
+        <option value="5">5 Tiket</option>
+      </select>
+
+      <button type="submit" id="submitBtn">
+        Pesan Tiket
+      </button>
+
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <div id="ticket">
+
+      <h2>🎟️ TIKET UYEE FEST</h2>
+
+      <p>Ticket Code:</p>
+
+      <div class="ticket-code" id="ticketCode"></div>
+
+      <div id="qrcode"></div>
+
+      <div class="info">
+        <strong>Nama:</strong>
+        <span id="showNama"></span>
+        <br>
+
+        <strong>Email:</strong>
+        <span id="showEmail"></span>
+        <br>
+
+        <strong>WhatsApp:</strong>
+        <span id="showWhatsapp"></span>
+        <br>
+
+        <strong>Jumlah Tiket:</strong>
+        <span id="showJumlah"></span>
+        <br>
+
+        <strong>Status:</strong>
+        <span id="showStatus">VALID</span>
+      </div>
+
+      <p class="note">
+        Tunjukkan QR Code ini saat melakukan check-in.
+      </p>
+
+      <button
+        type="button"
+        class="print-btn"
+        onclick="window.print()"
+      >
+        Cetak Tiket
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    /*
+      ============================================
+      SUPABASE CONFIGURATION
+      ============================================
+
+      NANTI KITA ISI 2 DATA INI:
+      1. SUPABASE_URL
+      2. SUPABASE_ANON_KEY
+    */
+
+    const SUPABASE_URL = "https://vlcvhvlqmvoqcfgumjsy.supabase.co";
+
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsY3ZodmxxbXZvcWNmZ3VtanN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4Mjg0ODQsImV4cCI6MjEwMzQwNDQ4NH0.9VYsCpWwiySxo9E0Q8Nf7RDc-04_PY0GyO65m0e8rfU";
+
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+    const form = document.getElementById("ticketForm");
+    const message = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+    const ticket = document.getElementById("ticket");
+
+
+    function generateTicketCode() {
+
+      const time = Date.now().toString(36).toUpperCase();
+
+      const random = Math.random()
+        .toString(36)
+        .substring(2, 7)
+        .toUpperCase();
+
+      return "UYE-" + time + "-" + random;
+    }
+
+
+    function generateQrToken() {
+
+      return crypto.randomUUID();
+
+    }
+
+
+    function showMessage(text, type) {
+
+      message.textContent = text;
+
+      message.className = "message " + type;
+
+      message.style.display = "block";
+
+    }
+
+
+    form.addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+      submitBtn.disabled = true;
+
+      submitBtn.textContent = "Memproses...";
+
+      message.style.display = "none";
+
+
+      const nama =
+        document.getElementById("nama").value.trim();
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const whatsapp =
+        document.getElementById("whatsapp").value.trim();
+
+      const jumlah =
+        parseInt(document.getElementById("jumlah").value);
+
+
+      const ticketCode = generateTicketCode();
+
+      const qrToken = generateQrToken();
+
+
+      try {
+
+        const { data, error } =
+          await supabaseClient
+            .from("tickets")
+            .insert([
+              {
+                "Nama Lengkap Sesuai KTP": nama,
+                "Email": email,
+                "Whatsapp": whatsapp,
+                "Jumlah Ticket": jumlah,
+                "Ticket Code": ticketCode,
+                "Payment Status": "PENDING",
+                "Ticket Status": "VALID",
+                "Qr Token": qrToken
+              }
+            ])
+            .select()
+            .single();
+
+
+        if (error) {
+
+          console.error(error);
+
+          throw error;
+
+        }
+
+
+        document.getElementById("showNama").textContent =
+          nama;
+
+        document.getElementById("showEmail").textContent =
+          email;
+
+        document.getElementById("showWhatsapp").textContent =
+          whatsapp;
+
+        document.getElementById("showJumlah").textContent =
+          jumlah + " tiket";
+
+        document.getElementById("ticketCode").textContent =
+          ticketCode;
+
+
+        const qrContainer =
+          document.getElementById("qrcode");
+
+        qrContainer.innerHTML = "";
+
+
+        new QRCode(qrContainer, {
+          text: qrToken,
+          width: 200,
+          height: 200
+        });
+
+
+        ticket.style.display = "block";
+
+
+        showMessage(
+          "Tiket berhasil dibuat!",
+          "success"
+        );
+
+
+        form.reset();
+
+
+        ticket.scrollIntoView({
+          behavior: "smooth"
+        });
+
+
+      } catch (error) {
+
+        showMessage(
+          "Gagal membuat tiket: " +
+          (error.message || "Terjadi kesalahan"),
+          "error"
+        );
+
+      }
+
+
+      submitBtn.disabled = false;
+
+      submitBtn.textContent = "Pesan Tiket";
+
+    });
+
+  </script>
+
+</body>
 </html>
