@@ -343,14 +343,14 @@
             .from("tickets")
             .insert([
               {
-                "Nama Lengkap Sesuai KTP": nama,
-                "Email": email,
-                "Whatsapp": whatsapp,
-                "Jumlah Ticket": jumlah,
-                "Ticket Code": ticketCode,
-                "Payment Status": "PENDING",
-                "Ticket Status": "VALID",
-                "Qr Token": qrToken
+               nama_lengkap: nama,
+        email: email,
+    whatsapp: whatsapp,
+    jumlah_tiket: jumlah,
+    ticket_code: ticketCode,
+    payment_status: "PENDING",
+    ticket_status: "VALID",
+    qr_token: qrToken
               }
             ])
             .select()
