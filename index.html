@@ -1,1119 +1,1215 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>UYEE FEST - Tiket Online</title>
+<title>UYEE FEST - Tiket Online</title>
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-  <!-- QR Code -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+* {
+    box-sizing: border-box;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f3f3f3;
+    color: #111;
+}
+
+.container {
+    width: 100%;
+    max-width: 680px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.logo {
+    text-align: center;
+    font-size: 34px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 18px;
+    margin-bottom: 8px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #111;
+}
+
+button {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#pesanBtn {
+    margin-top: 25px;
+    background: #111;
+    color: white;
+}
+
+#pesanBtn:hover {
+    background: #222;
+}
+
+#pesanBtn:disabled {
+    background: #777;
+    cursor: not-allowed;
+}
+
+.success {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #dcfce7;
+    color: #166534;
+    font-weight: bold;
+}
+
+.error {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #991b1b;
+    font-weight: bold;
+}
+
+/* PEMBAYARAN */
+
+#paymentSection {
+    display: none;
+    margin-top: 30px;
+}
+
+.payment-card {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.payment-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.bank-box {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+}
+
+.bank-box p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.total-box {
+    margin-top: 20px;
+    padding: 20px;
+    background: #111;
+    color: white;
+    border-radius: 12px;
+}
+
+.total-label {
+    font-size: 15px;
+    opacity: 0.8;
+}
+
+.total-price {
+    font-size: 32px;
+    font-weight: 800;
+    margin-top: 5px;
+}
+
+.upload-box {
+    margin-top: 25px;
+}
+
+.upload-box input[type="file"] {
+    background: white;
+    padding: 12px;
+}
+
+#uploadBtn {
+    margin-top: 15px;
+    background: #f59e0b;
+    color: white;
+}
+
+#uploadBtn:hover {
+    background: #d97706;
+}
+
+#uploadBtn:disabled {
+    background: #999;
+}
+
+/* TIKET */
+
+#ticketSection {
+    display: none;
+    margin-top: 30px;
+}
+
+.ticket {
+    background: white;
+    border: 2px dashed #222;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.ticket-header {
+    text-align: center;
+}
+
+.ticket-header h2 {
+    margin: 0;
+    font-size: 27px;
+}
+
+.ticket-code-label {
+    margin-top: 25px;
+    color: #666;
+}
+
+.ticket-code {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-top: 8px;
+    word-break: break-word;
+}
+
+#qrcode {
+    display: flex;
+    justify-content: center;
+    margin: 25px 0;
+}
+
+.ticket-info {
+    line-height: 1.8;
+    font-size: 16px;
+}
+
+.ticket-info strong {
+    display: inline-block;
+    min-width: 120px;
+}
+
+.note {
+    text-align: center;
+    color: #777;
+    margin-top: 25px;
+}
+
+#printBtn {
+    margin-top: 25px;
+    background: #555;
+    color: white;
+}
+
+#printBtn:hover {
+    background: #333;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.loading {
+    text-align: center;
+    margin-top: 15px;
+    color: #555;
+}
+
+@media print {
 
     body {
-      margin: 0;
-      padding: 30px 15px;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f3f3f3;
-      color: #111;
+        background: white;
     }
 
     .container {
-      width: 100%;
-      max-width: 650px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.10);
+        max-width: 100%;
+        margin: 0;
     }
 
-    h1 {
-      text-align: center;
-      margin: 0;
-      font-size: 34px;
+    .card > *:not(#ticketSection) {
+        display: none !important;
     }
-
-    .subtitle {
-      text-align: center;
-      color: #666;
-      font-size: 18px;
-      margin: 8px 0 30px;
-    }
-
-    label {
-      display: block;
-      font-weight: bold;
-      margin-top: 18px;
-      margin-bottom: 7px;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 9px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: #111;
-    }
-
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 9px;
-      padding: 16px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-
-    .main-button {
-      background: #111;
-      color: white;
-    }
-
-    .main-button:hover {
-      background: #222;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .message {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      display: none;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    .error {
-      background: #ffe5e5;
-      color: #b00000;
-    }
-
-    .success {
-      background: #e5ffe9;
-      color: #087a20;
-    }
-
-    /* PAYMENT */
-
-    #paymentSection {
-      display: none;
-      margin-top: 30px;
-      padding: 25px;
-      border: 2px solid #ddd;
-      border-radius: 15px;
-      background: #fafafa;
-    }
-
-    .payment-title {
-      margin-top: 0;
-      font-size: 25px;
-    }
-
-    .payment-box {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-      border: 1px solid #ddd;
-    }
-
-    .payment-box p {
-      font-size: 16px;
-      line-height: 1.7;
-      margin: 8px 0;
-    }
-
-    .amount {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #ccc;
-    }
-
-    .amount-title {
-      font-weight: bold;
-      font-size: 17px;
-    }
-
-    .amount-value {
-      font-size: 30px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    .upload-title {
-      display: block;
-      margin-top: 25px;
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    .file-input {
-      margin-top: 8px;
-      background: white;
-      padding: 10px;
-    }
-
-    .upload-button {
-      background: #111;
-      color: white;
-    }
-
-    .small-text {
-      display: block;
-      margin-top: 8px;
-      color: #666;
-      font-size: 13px;
-    }
-
-    /* TICKET */
 
     #ticketSection {
-      display: none;
-      margin-top: 30px;
+        display: block !important;
+        margin: 0;
     }
 
     .ticket {
-      border: 2px dashed #222;
-      border-radius: 15px;
-      padding: 25px;
-      background: white;
-    }
-
-    .ticket-title {
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    .ticket-code-label {
-      text-align: center;
-      color: #555;
-      margin-bottom: 5px;
-    }
-
-    .ticket-code {
-      text-align: center;
-      font-size: 25px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      margin-bottom: 20px;
-    }
-
-    #qrcode {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-    }
-
-    .ticket-info {
-      line-height: 1.9;
-      font-size: 16px;
-    }
-
-    .ticket-info strong {
-      display: inline-block;
-      min-width: 120px;
-    }
-
-    .valid {
-      color: green;
-      font-weight: bold;
-    }
-
-    .note {
-      text-align: center;
-      color: #666;
-      margin-top: 20px;
-    }
-
-    .print-button {
-      background: #555;
-      color: white;
-      margin-top: 20px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    @media print {
-      body {
-        background: white;
-        padding: 0;
-      }
-
-      body * {
-        visibility: hidden;
-      }
-
-      #ticketSection,
-      #ticketSection * {
-        visibility: visible;
-      }
-
-      #ticketSection {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-
-      .print-button {
-        display: none !important;
-      }
-
-      .ticket {
         border: 2px dashed #000;
         box-shadow: none;
-      }
     }
-  </style>
+
+    #printBtn {
+        display: none;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-  <h1>UYEE FEST</h1>
-  <div class="subtitle">Pendaftaran Tiket Online</div>
+<div class="card">
 
-  <!-- ========================= -->
-  <!-- FORM PENDAFTARAN -->
-  <!-- ========================= -->
+    <div class="logo">
+        🎟️ UYEE FEST
+    </div>
 
-  <form id="ticketForm">
+    <div class="subtitle">
+        Pendaftaran Tiket Online
+    </div>
 
-    <label for="nama">
-      Nama Lengkap Sesuai KTP
-    </label>
+    <!-- FORM PENDAFTARAN -->
 
-    <input
-      type="text"
-      id="nama"
-      placeholder="Masukkan nama lengkap sesuai KTP"
-      required
-    >
+    <div id="formSection">
 
-    <label for="email">
-      Email
-    </label>
+        <label for="nama">
+            Nama Lengkap Sesuai KTP
+        </label>
 
-    <input
-      type="email"
-      id="email"
-      placeholder="contoh@gmail.com"
-      required
-    >
+        <input
+            type="text"
+            id="nama"
+            placeholder="Masukkan nama lengkap sesuai KTP"
+            required
+        >
 
-    <label for="whatsapp">
-      WhatsApp
-    </label>
+        <label for="email">
+            Email
+        </label>
 
-    <input
-      type="tel"
-      id="whatsapp"
-      placeholder="08xxxxxxxxxx"
-      required
-    >
+        <input
+            type="email"
+            id="email"
+            placeholder="contoh@gmail.com"
+            required
+        >
 
-    <label for="jumlahTiket">
-      Jumlah Tiket
-    </label>
+        <label for="whatsapp">
+            WhatsApp
+        </label>
 
-    <select id="jumlahTiket" required>
-      <option value="1">1 Tiket</option>
-    </select>
+        <input
+            type="text"
+            id="whatsapp"
+            placeholder="08xxxxxxxxxx"
+            required
+        >
 
-    <button
-      type="submit"
-      id="submitBtn"
-      class="main-button"
-    >
-      Pesan Tiket
-    </button>
+        <label for="jumlah">
+            Jumlah Tiket
+        </label>
 
-  </form>
+        <select id="jumlah">
+            <option value="1">1 Tiket</option>
+        </select>
 
-  <div
-    id="message"
-    class="message"
-  ></div>
+        <button id="pesanBtn">
+            Pesan Tiket
+        </button>
 
-
-  <!-- ========================= -->
-  <!-- PEMBAYARAN -->
-  <!-- ========================= -->
-
-  <section id="paymentSection">
-
-    <h2 class="payment-title">
-      💳 Pembayaran Tiket
-    </h2>
-
-    <p>
-      Silakan lakukan pembayaran terlebih dahulu sebelum
-      mengupload bukti transfer.
-    </p>
-
-    <div class="payment-box">
-
-      <h3>Transfer Bank</h3>
-
-      <p>
-        <strong>Bank:</strong>
-        BCA
-      </p>
-
-      <p>
-        <strong>No. Rekening:</strong>
-        1160544887
-      </p>
-
-      <p>
-        <strong>Atas Nama:</strong>
-        Muhammad Fadhil Pratama
-      </p>
-
-      <div class="amount">
-
-        <div class="amount-title">
-          Jumlah Pembayaran
-        </div>
-
-        <div class="amount-value">
-          Rp 50.000
-        </div>
-
-      </div>
+        <div id="statusPesan"></div>
 
     </div>
 
 
-    <label class="upload-title" for="buktiBayar">
-      Upload Bukti Transfer
-    </label>
+    <!-- ========================= -->
+    <!-- PEMBAYARAN -->
+    <!-- ========================= -->
 
-    <input
-      type="file"
-      id="buktiBayar"
-      class="file-input"
-      accept="image/jpeg,image/png,image/webp"
-    >
+    <div id="paymentSection">
 
-    <span class="small-text">
-      Format JPG, PNG, atau WEBP. Maksimal 5 MB.
-    </span>
+        <div class="payment-card">
 
-    <button
-      type="button"
-      id="uploadBayarBtn"
-      class="upload-button"
-    >
-      Upload Bukti Pembayaran
-    </button>
+            <div class="payment-title">
+                💳 Pembayaran Tiket
+            </div>
 
-    <div
-      id="uploadStatus"
-      class="message"
-    ></div>
+            <p>
+                Silakan lakukan pembayaran terlebih dahulu.
+            </p>
 
-  </section>
+            <div class="bank-box">
+
+                <h3>
+                    Transfer Bank
+                </h3>
+
+                <p>
+                    <strong>Bank:</strong> BCA
+                </p>
+
+                <p>
+                    <strong>No. Rekening:</strong> 1160544887
+                </p>
+
+                <p>
+                    <strong>Atas Nama:</strong>
+                    Muhammad Fadhil Pratama
+                </p>
+
+            </div>
 
 
-  <!-- ========================= -->
-  <!-- TIKET -->
-  <!-- ========================= -->
+            <div class="total-box">
 
-  <section id="ticketSection">
+                <div class="total-label">
+                    Jumlah Pembayaran
+                </div>
 
-    <div class="ticket">
+                <div class="total-price">
+                    Rp 50.000
+                </div>
 
-      <div class="ticket-title">
-        🎟️ TIKET UYEE FEST
-      </div>
+            </div>
 
-      <div class="ticket-code-label">
-        Ticket Code:
-      </div>
 
-      <div
-        id="ticketCode"
-        class="ticket-code"
-      >
-      </div>
+            <div class="upload-box">
 
-      <div id="qrcode"></div>
+                <label for="buktiBayar">
+                    📷 Upload Bukti Pembayaran
+                </label>
 
-      <div class="ticket-info">
+                <input
+                    type="file"
+                    id="buktiBayar"
+                    accept="image/jpeg,image/png,image/webp"
+                >
 
-        <div>
-          <strong>Nama:</strong>
-          <span id="showNama"></span>
+                <small>
+                    Format JPG, PNG, atau WEBP. Maksimal 5 MB.
+                </small>
+
+                <button id="uploadBtn">
+                    Kirim Bukti Pembayaran
+                </button>
+
+                <div id="uploadStatus"></div>
+
+            </div>
+
         </div>
-
-        <div>
-          <strong>Email:</strong>
-          <span id="showEmail"></span>
-        </div>
-
-        <div>
-          <strong>WhatsApp:</strong>
-          <span id="showWhatsapp"></span>
-        </div>
-
-        <div>
-          <strong>Jumlah Tiket:</strong>
-          <span id="showJumlah"></span>
-        </div>
-
-        <div>
-          <strong>Status:</strong>
-          <span class="valid">VALID</span>
-        </div>
-
-      </div>
-
-      <p class="note">
-        Tunjukkan QR Code ini saat melakukan check-in.
-      </p>
-
-      <button
-        type="button"
-        class="print-button"
-        onclick="window.print()"
-      >
-        Cetak Tiket
-      </button>
 
     </div>
 
-  </section>
+
+    <!-- ========================= -->
+    <!-- TIKET -->
+    <!-- ========================= -->
+
+    <div id="ticketSection">
+
+        <div class="ticket">
+
+            <div class="ticket-header">
+
+                <h2>
+                    🎟️ TIKET UYEE FEST
+                </h2>
+
+                <div class="ticket-code-label">
+                    Ticket Code:
+                </div>
+
+                <div
+                    class="ticket-code"
+                    id="ticketCode">
+                </div>
+
+            </div>
+
+
+            <div id="qrcode"></div>
+
+
+            <div class="ticket-info">
+
+                <div>
+                    <strong>Nama:</strong>
+                    <span id="showNama"></span>
+                </div>
+
+                <div>
+                    <strong>Email:</strong>
+                    <span id="showEmail"></span>
+                </div>
+
+                <div>
+                    <strong>WhatsApp:</strong>
+                    <span id="showWhatsapp"></span>
+                </div>
+
+                <div>
+                    <strong>Jumlah Tiket:</strong>
+                    <span id="showJumlah"></span>
+                </div>
+
+                <div>
+                    <strong>Status:</strong>
+                    <span id="showStatus">
+                        VALID
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="note">
+                Tunjukkan QR Code ini saat melakukan check-in.
+            </div>
+
+
+            <button id="printBtn">
+                🖨️ Cetak Tiket
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 </div>
 
 
 <script>
 
-  /* ==================================================
-     KONFIGURASI SUPABASE
-     ================================================== */
+/* =====================================================
+   KONFIGURASI SUPABASE
+   ===================================================== */
 
-  /*
-    GANTI 2 BARIS DI BAWAH INI DENGAN DATA SUPABASE KAMU.
+/*
+   GANTI 2 BARIS DI BAWAH INI DENGAN
+   URL DAN KEY SUPABASE KAMU.
 
-    Jangan gunakan service_role key.
+   JANGAN gunakan service_role / secret key.
 
-    Gunakan Publishable/Anon Key.
-  */
+   Gunakan:
+   - anon key lama
+   ATAU
+   - sb_publishable_...
+*/
 
-  const SUPABASE_URL = "https://vlcvhvlqmvoqcfgumjsy.supabase.co";
+const SUPABASE_URL = "https://vlcvhvlqmvoqcfgumjsy.supabase.co";
 
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsY3ZodmxxbXZvcWNmZ3VtanN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4Mjg0ODQsImV4cCI6MjEwMzQwNDQ4NH0.9VYsCpWwiySxo9E0Q8Nf7RDc-04_PY0GyO65m0e8rfU";
-
-
-  /*
-    Nama bucket Storage.
-    Sesuai dengan bucket yang kita gunakan sebelumnya.
-  */
-
-  const STORAGE_BUCKET = "bukti-pembayaran";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsY3ZodmxxbXZvcWNmZ3VtanN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4Mjg0ODQsImV4cCI6MjEwMzQwNDQ4NH0.9VYsCpWwiySxo9E0Q8Nf7RDc-04_PY0GyO65m0e8rfU";
 
 
-  /* Membuat koneksi Supabase */
+/* Nama bucket */
+const STORAGE_BUCKET = "bukti-pembayaran";
 
-  const supabaseClient =
+
+/* Harga tiket */
+const HARGA_TIKET = 50000;
+
+
+/* =====================================================
+   SUPABASE CLIENT
+   ===================================================== */
+
+const supabaseClient =
     window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
+        SUPABASE_URL,
+        SUPABASE_KEY
     );
 
 
-  /* ==================================================
-     HARGA
-     ================================================== */
+/* =====================================================
+   ELEMENT HTML
+   ===================================================== */
 
-  const HARGA_TIKET = 50000;
+const namaInput =
+    document.getElementById("nama");
 
+const emailInput =
+    document.getElementById("email");
 
-  /* ==================================================
-     ELEMENT
-     ================================================== */
+const whatsappInput =
+    document.getElementById("whatsapp");
 
-  const ticketForm =
-    document.getElementById("ticketForm");
+const jumlahInput =
+    document.getElementById("jumlah");
 
-  const submitBtn =
-    document.getElementById("submitBtn");
+const pesanBtn =
+    document.getElementById("pesanBtn");
 
-  const message =
-    document.getElementById("message");
+const statusPesan =
+    document.getElementById("statusPesan");
 
-  const paymentSection =
+const paymentSection =
     document.getElementById("paymentSection");
 
-  const buktiBayar =
-    document.getElementById("buktiBayar");
-
-  const uploadBayarBtn =
-    document.getElementById("uploadBayarBtn");
-
-  const uploadStatus =
-    document.getElementById("uploadStatus");
-
-  const ticketSection =
+const ticketSection =
     document.getElementById("ticketSection");
 
+const buktiBayar =
+    document.getElementById("buktiBayar");
 
-  /* ==================================================
-     DATA PEMESAN SEMENTARA
-     ================================================== */
+const uploadBtn =
+    document.getElementById("uploadBtn");
 
-  let pemesan = null;
+const uploadStatus =
+    document.getElementById("uploadStatus");
 
+const ticketCodeElement =
+    document.getElementById("ticketCode");
 
-  /* ==================================================
-     FUNGSI PESANAN
-     ================================================== */
+const showNama =
+    document.getElementById("showNama");
 
-  ticketForm.addEventListener(
-    "submit",
-    function(event) {
+const showEmail =
+    document.getElementById("showEmail");
 
-      event.preventDefault();
+const showWhatsapp =
+    document.getElementById("showWhatsapp");
 
+const showJumlah =
+    document.getElementById("showJumlah");
 
-      const nama =
-        document.getElementById("nama").value.trim();
-
-      const email =
-        document.getElementById("email").value.trim();
-
-      const whatsapp =
-        document.getElementById("whatsapp").value.trim();
-
-      const jumlah =
-        document.getElementById("jumlahTiket").value;
+const showStatus =
+    document.getElementById("showStatus");
 
 
-      if (!nama || !email || !whatsapp) {
+/* =====================================================
+   DATA TIKET SEMENTARA
+   ===================================================== */
 
-        showMessage(
-          message,
-          "❌ Semua data wajib diisi.",
-          "error"
-        );
-
-        return;
-      }
+let currentTicket = null;
 
 
-      /*
-        Karena 1 link hanya untuk 1 tiket,
-        jumlah selalu 1.
-      */
+/* =====================================================
+   BUAT KODE TIKET
+   ===================================================== */
 
-      if (jumlah !== "1") {
+function generateTicketCode() {
 
-        showMessage(
-          message,
-          "❌ Setiap link hanya dapat memesan 1 tiket.",
-          "error"
-        );
+    const chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-        return;
-      }
+    let randomPart = "";
 
+    for (let i = 0; i < 10; i++) {
 
-      /*
-        Simpan data sementara.
-        Tiket belum dibuat.
-        Tiket baru dibuat setelah bukti transfer
-        berhasil diupload.
-      */
-
-      pemesan = {
-        nama: nama,
-        email: email,
-        whatsapp: whatsapp,
-        jumlah: 1
-      };
-
-
-      /*
-        Tampilkan pembayaran.
-      */
-
-      paymentSection.style.display = "block";
-
-
-      /*
-        Scroll otomatis ke pembayaran.
-      */
-
-      paymentSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-
-
-      showMessage(
-        message,
-        "✅ Data berhasil. Silakan lakukan pembayaran Rp 50.000 lalu upload bukti transfer.",
-        "success"
-      );
+        randomPart +=
+            chars.charAt(
+                Math.floor(
+                    Math.random() * chars.length
+                )
+            );
 
     }
-  );
+
+    return "UYE-" +
+        randomPart.substring(0, 7) +
+        "-" +
+        randomPart.substring(7);
+
+}
 
 
-  /* ==================================================
-     UPLOAD BUKTI PEMBAYARAN
-     ================================================== */
+/* =====================================================
+   FORMAT RUPIAH
+   ===================================================== */
 
-  uploadBayarBtn.addEventListener(
+function formatRupiah(number) {
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }
+    ).format(number);
+
+}
+
+
+/* =====================================================
+   PESAN TIKET
+   ===================================================== */
+
+pesanBtn.addEventListener(
     "click",
-    async function() {
+    async function () {
 
-      try {
+        statusPesan.innerHTML = "";
 
-        /*
-          Pastikan data pemesan sudah ada.
-        */
+        const nama =
+            namaInput.value.trim();
 
-        if (!pemesan) {
+        const email =
+            emailInput.value.trim();
 
-          showMessage(
-            uploadStatus,
-            "❌ Silakan tekan Pesan Tiket terlebih dahulu.",
-            "error"
-          );
+        const whatsapp =
+            whatsappInput.value.trim();
 
-          return;
+        const jumlah =
+            parseInt(jumlahInput.value);
+
+
+        /* VALIDASI */
+
+        if (!nama) {
+
+            statusPesan.innerHTML =
+                '<div class="error">❌ Nama wajib diisi.</div>';
+
+            namaInput.focus();
+
+            return;
         }
 
 
-        /*
-          Ambil file.
-        */
+        if (!email) {
+
+            statusPesan.innerHTML =
+                '<div class="error">❌ Email wajib diisi.</div>';
+
+            emailInput.focus();
+
+            return;
+        }
+
+
+        if (!whatsapp) {
+
+            statusPesan.innerHTML =
+                '<div class="error">❌ WhatsApp wajib diisi.</div>';
+
+            whatsappInput.focus();
+
+            return;
+        }
+
+
+        /* TOMBOL LOADING */
+
+        pesanBtn.disabled = true;
+
+        pesanBtn.textContent =
+            "Memproses...";
+
+
+        try {
+
+            /* BUAT KODE TIKET */
+
+            const ticketCode =
+                generateTicketCode();
+
+
+            /* DATA TIKET */
+
+            const ticketData = {
+
+                nama_lengkap: nama,
+
+                email: email,
+
+                whatsapp: whatsapp,
+
+                jumlah_tiket: jumlah,
+
+                ticket_code: ticketCode
+
+            };
+
+
+            /*
+             * SIMPAN KE TABLE tickets
+             */
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+                .from("tickets")
+                .insert(ticketData)
+                .select()
+                .single();
+
+
+            if (error) {
+
+                console.error(
+                    "Supabase ticket error:",
+                    error
+                );
+
+                throw error;
+            }
+
+
+            /* SIMPAN DATA TIKET */
+
+            currentTicket = {
+
+                id: data.id,
+
+                nama: nama,
+
+                email: email,
+
+                whatsapp: whatsapp,
+
+                jumlah: jumlah,
+
+                ticketCode: ticketCode
+
+            };
+
+
+            /* TAMPILKAN PESAN */
+
+            statusPesan.innerHTML =
+                '<div class="success">✅ Tiket berhasil dibuat!</div>';
+
+
+            /* =====================================
+               TAMPILKAN PEMBAYARAN
+               ===================================== */
+
+            paymentSection.style.display =
+                "block";
+
+
+            /* SCROLL KE PEMBAYARAN */
+
+            setTimeout(
+                function () {
+
+                    paymentSection.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+                },
+                300
+            );
+
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            statusPesan.innerHTML =
+                '<div class="error">❌ Gagal membuat tiket: ' +
+                (error.message || error) +
+                '</div>';
+
+        }
+
+        finally {
+
+            pesanBtn.disabled = false;
+
+            pesanBtn.textContent =
+                "Pesan Tiket";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   UPLOAD BUKTI PEMBAYARAN
+   ===================================================== */
+
+uploadBtn.addEventListener(
+    "click",
+    async function () {
+
+        uploadStatus.innerHTML = "";
+
+
+        /* CEK TIKET */
+
+        if (!currentTicket) {
+
+            uploadStatus.innerHTML =
+                '<div class="error">❌ Data tiket belum tersedia.</div>';
+
+            return;
+        }
+
+
+        /* CEK FILE */
 
         const file =
-          buktiBayar.files[0];
+            buktiBayar.files[0];
 
 
         if (!file) {
 
-          showMessage(
-            uploadStatus,
-            "❌ Silakan pilih bukti transfer terlebih dahulu.",
-            "error"
-          );
+            uploadStatus.innerHTML =
+                '<div class="error">❌ Silakan pilih bukti pembayaran terlebih dahulu.</div>';
 
-          return;
+            return;
         }
 
 
-        /*
-          Maksimal 5 MB.
-        */
+        /* CEK UKURAN */
 
         if (file.size > 5 * 1024 * 1024) {
 
-          showMessage(
-            uploadStatus,
-            "❌ Ukuran file maksimal 5 MB.",
-            "error"
-          );
+            uploadStatus.innerHTML =
+                '<div class="error">❌ Ukuran file maksimal 5 MB.</div>';
 
-          return;
+            return;
         }
 
 
-        /*
-          Hanya gambar.
-        */
+        /* CEK TIPE */
 
-        if (!file.type.startsWith("image/")) {
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
 
-          showMessage(
-            uploadStatus,
-            "❌ File harus berupa gambar.",
-            "error"
-          );
 
-          return;
+        if (!allowedTypes.includes(file.type)) {
+
+            uploadStatus.innerHTML =
+                '<div class="error">❌ File harus JPG, PNG, atau WEBP.</div>';
+
+            return;
         }
 
 
-        /*
-          Tombol dikunci sementara.
-        */
+        /* LOADING */
 
-        uploadBayarBtn.disabled = true;
+        uploadBtn.disabled = true;
 
-        uploadBayarBtn.textContent =
-          "Sedang Upload...";
+        uploadBtn.textContent =
+            "Mengupload...";
 
 
-        uploadStatus.style.display = "block";
+        try {
 
-        uploadStatus.className =
-          "message success";
+            /*
+             * EXTENSION FILE
+             */
 
-        uploadStatus.textContent =
-          "⏳ Sedang mengupload bukti pembayaran...";
-
-
-        /*
-          Generate ticket code.
-        */
-
-        const ticketCode =
-          generateTicketCode();
+            let extension =
+                file.name
+                    .split(".")
+                    .pop()
+                    .toLowerCase();
 
 
-        /*
-          Ambil ekstensi file.
-        */
+            /*
+             * NAMA FILE AMAN
+             */
 
-        const extension =
-          file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
-
-
-        /*
-          Nama file unik.
-
-          Contoh:
-          bukti/UYE-MTRB3T6V-HJX7W-175....jpg
-        */
-
-        const fileName =
-          ticketCode +
-          "-" +
-          Date.now() +
-          "." +
-          extension;
+            const fileName =
+                currentTicket.ticketCode +
+                "-" +
+                Date.now() +
+                "." +
+                extension;
 
 
-        const filePath =
-          "bukti/" + fileName;
+            /*
+             * PATH FILE
+             */
+
+            const filePath =
+                "tickets/" +
+                fileName;
 
 
-        /* ==================================================
-           UPLOAD KE SUPABASE STORAGE
-           ================================================== */
+            /*
+             * UPLOAD KE SUPABASE STORAGE
+             */
 
-        const uploadResult =
-          await supabaseClient
-            .storage
-            .from(STORAGE_BUCKET)
-            .upload(
-              filePath,
-              file,
-              {
-                cacheControl: "3600",
-                upsert: false,
-                contentType: file.type
-              }
-            );
+            const {
+                data,
+                error
+            } = await supabaseClient
+                .storage
+                .from(STORAGE_BUCKET)
+                .upload(
+                    filePath,
+                    file,
+                    {
+                        cacheControl: "3600",
+                        upsert: false,
+                        contentType: file.type
+                    }
+                );
 
 
-        if (uploadResult.error) {
+            if (error) {
 
-          console.error(
-            uploadResult.error
-          );
+                console.error(
+                    "Storage error:",
+                    error
+                );
 
-          throw new Error(
-            "Upload gagal: " +
-            uploadResult.error.message
-          );
+                throw error;
+            }
+
+
+            /*
+             * SIMPAN PATH BUKTI KE TABLE
+             */
+
+            const {
+                error: updateError
+            } = await supabaseClient
+                .from("tickets")
+                .update({
+                    bukti_pembayaran: data.path
+                })
+                .eq(
+                    "id",
+                    currentTicket.id
+                );
+
+
+            if (updateError) {
+
+                console.error(
+                    "Update ticket error:",
+                    updateError
+                );
+
+                throw updateError;
+            }
+
+
+            /*
+             * BERHASIL
+             */
+
+            uploadStatus.innerHTML =
+                '<div class="success">✅ Bukti pembayaran berhasil dikirim!</div>';
+
+
+            /*
+             * TAMPILKAN TIKET
+             */
+
+            tampilkanTiket();
+
+
         }
 
+        catch (error) {
 
-        /* ==================================================
-           URL FILE
-           ================================================== */
+            console.error(error);
 
-        const publicFile =
-          supabaseClient
-            .storage
-            .from(STORAGE_BUCKET)
-            .getPublicUrl(filePath);
+            uploadStatus.innerHTML =
+                '<div class="error">❌ Upload gagal: ' +
+                (error.message || error) +
+                '</div>';
 
-
-        const buktiUrl =
-          publicFile.data.publicUrl;
-
-
-        /* ==================================================
-           SIMPAN DATA TIKET KE DATABASE
-           ================================================== */
-
-        const insertResult =
-          await supabaseClient
-            .from("tickets")
-            .insert({
-
-              nama: pemesan.nama,
-
-              email: pemesan.email,
-
-              whatsapp: pemesan.whatsapp,
-
-              jumlah: 1,
-
-              ticket_code: ticketCode,
-
-              status: "VALID",
-
-              bukti_pembayaran: buktiUrl
-
-            });
-
-
-        if (insertResult.error) {
-
-          console.error(
-            insertResult.error
-          );
-
-          throw new Error(
-            "Data tiket gagal disimpan: " +
-            insertResult.error.message
-          );
         }
 
+        finally {
 
-        /* ==================================================
-           BERHASIL
-           ================================================== */
+            uploadBtn.disabled = false;
 
-        showTicket(
-          pemesan,
-          ticketCode
-        );
+            uploadBtn.textContent =
+                "Kirim Bukti Pembayaran";
 
-
-        uploadStatus.className =
-          "message success";
-
-        uploadStatus.style.display =
-          "block";
-
-        uploadStatus.textContent =
-          "✅ Bukti pembayaran berhasil diupload. Tiket berhasil dibuat.";
-
-
-        uploadBayarBtn.disabled = true;
-
-        uploadBayarBtn.textContent =
-          "✓ Pembayaran Terupload";
-
-
-      }
-
-      catch (error) {
-
-        console.error(error);
-
-
-        showMessage(
-          uploadStatus,
-          "❌ " + error.message,
-          "error"
-        );
-
-
-        uploadBayarBtn.disabled =
-          false;
-
-        uploadBayarBtn.textContent =
-          "Upload Bukti Pembayaran";
-
-      }
+        }
 
     }
-  );
+);
 
 
-  /* ==================================================
-     GENERATE TICKET CODE
-     ================================================== */
+/* =====================================================
+   TAMPILKAN TIKET
+   ===================================================== */
 
-  function generateTicketCode() {
+function tampilkanTiket() {
 
-    const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    let random =
-      "";
-
-    for (
-      let i = 0;
-      i < 10;
-      i++
-    ) {
-
-      random +=
-        chars.charAt(
-          Math.floor(
-            Math.random() *
-            chars.length
-          )
-        );
-
+    if (!currentTicket) {
+        return;
     }
 
 
-    return "UYE-" +
-      random.substring(0, 6) +
-      "-" +
-      random.substring(6);
-
-  }
+    ticketCodeElement.textContent =
+        currentTicket.ticketCode;
 
 
-  /* ==================================================
-     TAMPILKAN TIKET
-     ================================================== */
-
-  function showTicket(
-    data,
-    ticketCode
-  ) {
-
-    document.getElementById(
-      "showNama"
-    ).textContent =
-      data.nama;
+    showNama.textContent =
+        currentTicket.nama;
 
 
-    document.getElementById(
-      "showEmail"
-    ).textContent =
-      data.email;
+    showEmail.textContent =
+        currentTicket.email;
 
 
-    document.getElementById(
-      "showWhatsapp"
-    ).textContent =
-      data.whatsapp;
+    showWhatsapp.textContent =
+        currentTicket.whatsapp;
 
 
-    document.getElementById(
-      "showJumlah"
-    ).textContent =
-      "1 tiket";
+    showJumlah.textContent =
+        currentTicket.jumlah +
+        " tiket";
 
 
-    document.getElementById(
-      "ticketCode"
-    ).textContent =
-      ticketCode;
+    showStatus.textContent =
+        "VALID";
 
 
     /*
-      Bersihkan QR lama.
-    */
+     * HAPUS QR LAMA
+     */
 
-    const qr =
-      document.getElementById(
-        "qrcode"
-      );
+    const qrContainer =
+        document.getElementById("qrcode");
 
-    qr.innerHTML =
-      "";
+    qrContainer.innerHTML = "";
 
 
     /*
-      Isi QR dengan ticket code.
-    */
+     * DATA YANG DISIMPAN DI QR
+     */
 
-    new QRCode(
-      qr,
-      {
-        text: ticketCode,
-        width: 220,
-        height: 220,
-        correctLevel:
-          QRCode.CorrectLevel.H
-      }
-    );
+    const qrData =
+        JSON.stringify({
 
+            ticket_code:
+                currentTicket.ticketCode,
 
-    /*
-      Tampilkan tiket.
-    */
+            nama:
+                currentTicket.nama,
 
-    ticketSection.style.display =
-      "block";
+            email:
+                currentTicket.email,
 
+            whatsapp:
+                currentTicket.whatsapp,
 
-    /*
-      Scroll ke tiket.
-    */
+            jumlah_tiket:
+                currentTicket.jumlah,
 
-    setTimeout(
-      function() {
+            status:
+                "VALID"
 
-        ticketSection.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
         });
 
-      },
-      300
+
+    /*
+     * BUAT QR
+     */
+
+    new QRCode(
+        qrContainer,
+        {
+            text: qrData,
+            width: 220,
+            height: 220,
+            correctLevel:
+                QRCode.CorrectLevel.H
+        }
     );
 
-  }
+
+    /*
+     * TAMPILKAN TIKET
+     */
+
+    ticketSection.style.display =
+        "block";
 
 
-  /* ==================================================
-     MESSAGE
-     ================================================== */
+    /*
+     * SCROLL KE TIKET
+     */
 
-  function showMessage(
-    element,
-    text,
-    type
-  ) {
+    setTimeout(
+        function () {
 
-    element.textContent =
-      text;
+            ticketSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
 
-    element.className =
-      "message " + type;
+        },
+        500
+    );
 
-    element.style.display =
-      "block";
+}
 
-  }
+
+/* =====================================================
+   CETAK TIKET
+   ===================================================== */
+
+document
+    .getElementById("printBtn")
+    .addEventListener(
+        "click",
+        function () {
+
+            window.print();
+
+        }
+    );
+
 
 </script>
 
