@@ -146,7 +146,28 @@
 
 </div>
 <script>
+<script>
+document.getElementById("ticketForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
+    const nama = document.getElementById("nama").value;
+    const email = document.getElementById("email").value;
+    const telepon = document.getElementById("telepon").value;
+    const jumlah = document.getElementById("jumlah").value;
+
+    const harga = 50000;
+    const total = Number(jumlah) * harga;
+
+    alert(
+        "Data berhasil diproses!\n\n" +
+        "Nama: " + nama + "\n" +
+        "Email: " + email + "\n" +
+        "WhatsApp: " + telepon + "\n" +
+        "Jumlah tiket: " + jumlah + "\n" +
+        "Total pembayaran: Rp" + total.toLocaleString("id-ID")
+    );
+});
+</script>
 </script>
 </body>
 </html>
