@@ -152,6 +152,48 @@
         display: block !important;
       }
     }
+    /* =========================
+   PEMBAYARAN TIKET
+========================= */
+
+.payment-section {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 15px;
+    background: #f8f8f8;
+    border: 2px solid #ddd;
+}
+
+.payment-section h2 {
+    margin-top: 0;
+}
+
+.payment-box {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 15px 0;
+}
+
+#totalPayment {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#buktiBayar {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.payment-section small {
+    display: block;
+    margin-top: 8px;
+    color: #666;
+}
   </style>
 </head>
 
@@ -199,7 +241,47 @@
     </form>
 
     <div id="message" class="message"></div>
+<!-- PEMBAYARAN -->
+<div id="paymentSection" class="payment-section">
 
+    <h2>💳 Pembayaran Tiket</h2>
+
+    <p>Silakan lakukan pembayaran terlebih dahulu.</p>
+
+    <div class="payment-box">
+
+        <h3>Transfer Bank</h3>
+
+        <p><strong>Bank:</strong> BCA</p>
+        <p><strong>No. Rekening:</strong> 1160544887</p>
+        <p><strong>Atas Nama:</strong> Muhammad Fadhil Pratama</p>
+
+        <hr>
+
+        <h3>Jumlah Pembayaran</h3>
+
+        <p id="totalPayment">
+            Rp 0
+        </p>
+
+    </div>
+
+    <label for="buktiBayar">
+        <strong>Upload Bukti Pembayaran</strong>
+    </label>
+
+    <input
+        type="file"
+        id="buktiBayar"
+        accept="image/jpeg,image/png,image/webp"
+        required
+    >
+
+    <small>
+        Format JPG, PNG, atau WEBP. Maksimal 5 MB.
+    </small>
+
+</div>
     <div id="ticket">
 
       <h2>🎟️ TIKET UYEE FEST</h2>
